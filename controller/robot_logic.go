@@ -29,9 +29,9 @@ func (self *Logic) handleMsg(msg *robot_proto.ReceiveMsgInfo) {
 	case robot_proto.RECEIVE_MSG_TYPE_TEXT:
 		msgStr := strings.Replace(msg.Msg, " ", "", -1)
 		if strings.HasPrefix(msgStr, RMDMY_PREFIX) {
-			url := self.getVideo(msgStr)
+			url, vid := self.getVideo(msgStr)
 			if url != "" {
-				url = fmt.Sprintf("%s \n\n链接有可能会失效,失效后请重新获取", url)
+				url = fmt.Sprintf("第%d集，请点击链接播放\n%s \n\n链接有可能会失效，失效后请重新获取", vid, url)
 				self.sendMsg(msg, []MsgInfo{MsgInfo{MsgType: robot_proto.RECEIVE_MSG_TYPE_TEXT, Msg: url}})
 			} else {
 				holmes.Debug("get req[%s] url == nil", msgStr)
@@ -54,14 +54,14 @@ func (self *Logic) handleMsg(msg *robot_proto.ReceiveMsgInfo) {
 	}
 }
 
-func (self *Logic) getVideo(msg string) string {
+func (self *Logic) getVideo(msg string) (string, int) {
 	msg = strings.Replace(msg, RMDMY_PREFIX, "", -1)
 	vid, err := strconv.Atoi(msg)
 	if err != nil {
 		holmes.Error("strconv msg[%s] error: %v", err)
-		return ""
+		return "", 0
 	}
-	return self.cw.GetVideoUrl(vid)
+	return self.cw.GetVideoUrl(vid), vid
 }
 
 type MsgInfo struct {
