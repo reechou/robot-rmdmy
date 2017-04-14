@@ -262,14 +262,17 @@ func (self *CrawlWorker) getVideoInfo(url string) (string, error){
 	}
 	defer response.Body.Close()
 	reader, err := gzip.NewReader(response.Body)
-	if err != nil { panic(err) }
+	if err != nil {
+		holmes.Error("gzip new reader error: %v", err)
+		return "", err
+	}
 	
 	buff := make([]byte, 1024)
 	for {
 		n, err := reader.Read(buff)
-		
 		if err != nil && err != io.EOF {
-			panic(err)
+			holmes.Error("reader read error: %v", err)
+			return "", nil
 		}
 		
 		if n == 0 {
@@ -282,6 +285,10 @@ func (self *CrawlWorker) getVideoInfo(url string) (string, error){
 	src := reg.FindString(s)
 	src = strings.Replace(src, "\"", "", -1)
 	src = strings.Replace(src, "src=", "", -1)
+	if src == "" {
+		holmes.Error("get s[%s] error cannot found src", s)
+		return "", fmt.Errorf("src == nil")
+	}
 	
 	return self.getShortUrl(src)
 }
@@ -415,7 +422,7 @@ func (self *CrawlWorker) getShortUrl(urlStr string) (string, error) {
 	}
 
 	if strings.Contains(string(body), "error_code") {
-		holmes.Error("response: %s %s error", queryUrl, string(body))
+		holmes.Error("urlstr:%s rsp:%s error", urlStr, string(body))
 		return "", fmt.Errorf("response: %s error", string(body))
 	}
 
