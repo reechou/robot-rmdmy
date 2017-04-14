@@ -400,7 +400,8 @@ type RspShortUrl struct {
 }
 
 func (self *CrawlWorker) getShortUrl(urlStr string) (string, error) {
-	resp, err := http.Get(fmt.Sprintf("http://api.t.sina.com.cn/short_url/shorten.json?source=209678993&url_long=%s", url.QueryEscape(urlStr)))
+	queryUrl := fmt.Sprintf("http://api.t.sina.com.cn/short_url/shorten.json?source=209678993&url_long=%s", url.QueryEscape(urlStr))
+	resp, err := http.Get(queryUrl)
 	if err != nil {
 		holmes.Error("get short url error: %v", err)
 		return "", err
@@ -414,7 +415,7 @@ func (self *CrawlWorker) getShortUrl(urlStr string) (string, error) {
 	}
 
 	if strings.Contains(string(body), "error_code") {
-		holmes.Error("response: %s error", string(body))
+		holmes.Error("response: %s %s error", queryUrl, string(body))
 		return "", fmt.Errorf("response: %s error", string(body))
 	}
 
