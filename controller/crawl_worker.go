@@ -245,7 +245,7 @@ type RspVideoInfo struct {
 
 func (self *CrawlWorker) getVideoInfo(urlStr string) (string, error){
 	client := &http.Client{}
-	queryUrl := fmt.Sprintf("%s%s", urlStr, self.getToken())
+	queryUrl := fmt.Sprintf(urlStr, self.getToken())
 	request, err := http.NewRequest("GET", queryUrl, nil)
 	if err != nil {
 		return "", err
