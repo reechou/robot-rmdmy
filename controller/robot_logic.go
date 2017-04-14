@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"fmt"
 	"strings"
 	"strconv"
 	"time"
@@ -30,6 +31,7 @@ func (self *Logic) handleMsg(msg *robot_proto.ReceiveMsgInfo) {
 		if strings.HasPrefix(msgStr, RMDMY_PREFIX) {
 			url := self.getVideo(msgStr)
 			if url != "" {
+				url = fmt.Sprintf("%s \n\n链接有可能会失效,失效后请重新获取", url)
 				self.sendMsg(msg, []MsgInfo{MsgInfo{MsgType: robot_proto.RECEIVE_MSG_TYPE_TEXT, Msg: url}})
 			} else {
 				holmes.Debug("get req[%s] url == nil", msgStr)
