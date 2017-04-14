@@ -175,7 +175,7 @@ func (self *CrawlWorker) crawl() {
 		}(k, v)
 	}
 	wg.Wait()
-	holmes.Debug(self.videoUrlMap)
+	holmes.Debug("map: %v", self.videoUrlMap)
 
 	//for k, v := range RMDMY_VIDEO {
 	//	doc, err := self.getHtmlDoc(v)
