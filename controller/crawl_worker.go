@@ -167,7 +167,7 @@ func (self *CrawlWorker) crawl() {
 			defer wg.Done()
 			srcUrl, err := self.getVideoInfo(url)
 			if err != nil {
-				holmes.Error("get video[%s] error: %v", url, err)
+				holmes.Error("get video error: %v", err)
 				return
 			}
 			self.Lock()
@@ -243,10 +243,10 @@ type RspVideoInfo struct {
 //	return self.getShortUrl(vUrl)
 //}
 
-func (self *CrawlWorker) getVideoInfo(url string) (string, error){
+func (self *CrawlWorker) getVideoInfo(urlStr string) (string, error){
 	client := &http.Client{}
-	
-	request, err := http.NewRequest("GET", fmt.Sprintf("%s%s", url, self.getToken()), nil)
+	queryUrl := fmt.Sprintf("%s%s", urlStr, self.getToken())
+	request, err := http.NewRequest("GET", queryUrl, nil)
 	if err != nil {
 		return "", err
 	}
@@ -286,7 +286,7 @@ func (self *CrawlWorker) getVideoInfo(url string) (string, error){
 	src = strings.Replace(src, "\"", "", -1)
 	src = strings.Replace(src, "src=", "", -1)
 	if src == "" {
-		holmes.Error("get s[%s] error cannot found src", s)
+		holmes.Error("get url[%s] s[%s] error cannot found src", queryUrl, s)
 		return "", fmt.Errorf("src == nil")
 	}
 	
