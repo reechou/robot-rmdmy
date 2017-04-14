@@ -150,7 +150,7 @@ func (self *CrawlWorker) run() {
 	self.crawl()
 	for {
 		select {
-		case <-time.After(10 * time.Minute):
+		case <-time.After(time.Minute):
 			self.crawl()
 		case <-self.stop:
 			close(self.done)
