@@ -11,6 +11,7 @@ import (
 	"time"
 	"compress/gzip"
 	"io"
+	"net/url"
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/reechou/holmes"
@@ -175,6 +176,7 @@ func (self *CrawlWorker) crawl() {
 		}(k, v)
 	}
 	wg.Wait()
+	//fmt.Println(self.videoUrlMap)
 	holmes.Debug("map: %v", self.videoUrlMap)
 
 	//for k, v := range RMDMY_VIDEO {
@@ -397,8 +399,8 @@ type RspShortUrl struct {
 	Type     int    `json:"type"`
 }
 
-func (self *CrawlWorker) getShortUrl(url string) (string, error) {
-	resp, err := http.Get(fmt.Sprintf("http://api.t.sina.com.cn/short_url/shorten.json?source=209678993&url_long=%s", url))
+func (self *CrawlWorker) getShortUrl(urlStr string) (string, error) {
+	resp, err := http.Get(fmt.Sprintf("http://api.t.sina.com.cn/short_url/shorten.json?source=209678993&url_long=%s", url.QueryEscape(urlStr)))
 	if err != nil {
 		holmes.Error("get short url error: %v", err)
 		return "", err
@@ -425,6 +427,7 @@ func (self *CrawlWorker) getShortUrl(url string) (string, error) {
 	if len(rsp) == 0 {
 		return "", fmt.Errorf("len(rsp) == 0")
 	}
+	holmes.Debug("get short url: %v", rsp[0])
 	return rsp[0].UrlShort, nil
 }
 
