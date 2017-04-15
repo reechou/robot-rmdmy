@@ -165,9 +165,9 @@ func (self *CrawlWorker) crawl() {
 		wg.Add(1)
 		go func(key int, url string) {
 			defer wg.Done()
-			srcUrl, err := self.getVideoInfo(url)
+			srcUrl, err := self.getVideoInfo(key, url)
 			if err != nil {
-				holmes.Error("get video error: %v", err)
+				holmes.Error("get video[%d] error: %v", key, err)
 				return
 			}
 			self.Lock()
@@ -243,7 +243,11 @@ type RspVideoInfo struct {
 //	return self.getShortUrl(vUrl)
 //}
 
-func (self *CrawlWorker) getVideoInfo(urlStr string) (string, error){
+func (self *CrawlWorker) getVideoInfo(key int, urlStr string) (string, error) {
+	if key > 30 {
+		return self.getShortUrl(fmt.Sprintf("http://vcd11.shsha.cn/20170414/renmindmy%d/index.m3u8", key))
+	}
+	
 	client := &http.Client{}
 	queryUrl := fmt.Sprintf(urlStr, self.getToken())
 	request, err := http.NewRequest("GET", queryUrl, nil)
